@@ -1,43 +1,32 @@
 const http = require("http");
 const fs = require("fs");
+const path = require("path");
 
-console.log(`Server running on: http://localhost:8080/}`);
-const validPaths = ["./about.html", "./contact-me.html", "./index.html"];
+console.log("Server running on: http://localhost:8080/}");
+let dirName = path.join(__dirname, "404.html");
+const validPaths = ["about.html", "contact-me.html", "index.html"];
+
+function serveFile(filePath, res, statusCode = 200) {
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      res.writeHead(500, { "Content-Type": "text/html" });
+      return res.end("500 Internal Server Error");
+    }
+    res.writeHead(statusCode, { "Content-Type": "text/html" });
+    res.write(data);
+    return res.end();
+  });
+}
 
 http
   .createServer((req, res) => {
-    // Construct the file path from the provided url pathname
-    let path = `.${req.url}.html`;
+    const reqPath = req.url === "/" ? "index.html" : `${req.url}.html`;
+    const filePath = path.join(__dirname, reqPath);
 
-    // If no pathname is provided then make the pathname the index.html file
-    if (req.url === "/") {
-      path = `./index.html`;
-    }
-
-    // If the pathname provided isn't within the validPaths display the 404 page
-    if (!validPaths.includes(path)) {
-      fs.readFile("./404.html", (err, data) => {
-        if (err) {
-          res.writeHead(404, { "Content-Type": "text/html" });
-          return res.end("404 Not Found");
-        }
-        res.writeHead(404, { "Content-Type": "text/html" });
-        res.write(data);
-        return res.end();
-      });
-    }
-
-    // If the pathname provided is within the validPaths display the page
-    if (validPaths.includes(path)) {
-      fs.readFile(path, (err, data) => {
-        if (err) {
-          res.writeHead(404, { "Content-Type": "text/html" });
-          return res.end("404 Not Found");
-        }
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.write(data);
-        return res.end();
-      });
+    if (!validPaths.includes(path.basename(filePath))) {
+      serveFile(path.join(__dirname, "404.html"), res, 404);
+    } else {
+      serveFile(filePath, res);
     }
   })
   .listen(8080);
