@@ -2,8 +2,6 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 
-console.log("Server running on: http://localhost:8080/}");
-let dirName = path.join(__dirname, "404.html");
 const validPaths = ["about.html", "contact-me.html", "index.html"];
 
 function serveFile(filePath, res, statusCode = 200) {
@@ -29,4 +27,6 @@ http
       serveFile(filePath, res);
     }
   })
-  .listen(8080);
+  .listen(8080, () =>
+    console.log("Server running on: http://localhost:8080/}")
+  );
