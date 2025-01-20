@@ -4,7 +4,6 @@ const fs = require("fs");
 const path = require("path");
 
 const validPaths = ["about.html", "contact-me.html", "index.html"];
-const secretSauce = process.env.SECRET_SAUCE;
 
 function serveFile(filePath, res, statusCode = 200) {
   fs.readFile(filePath, (err, data) => {
@@ -14,7 +13,7 @@ function serveFile(filePath, res, statusCode = 200) {
     }
     res.writeHead(statusCode, { "Content-Type": "text/html" });
     res.write(data);
-    return res.end(secretSauce);
+    return res.end();
   });
 }
 
